@@ -1,0 +1,22 @@
+[package]
+name = "missing-signer"
+version = "0.1.0"
+description = "Security Pattern: Missing Signer Check - Demonstrates vulnerable and secure signer verification"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "missing_signer"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "0.31.1"
+# Pin blake3 to avoid edition2024 incompatibility with platform-tools v1.48 (rustc 1.84)
+blake3 = "=1.5.5"

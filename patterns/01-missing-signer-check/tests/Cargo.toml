@@ -1,0 +1,13 @@
+[package]
+name = "test-missing-signer"
+version = "0.1.0"
+edition = "2021"
+
+[[test]]
+name = "exploit"
+path = "tests/exploit.rs"
+
+[dev-dependencies]
+mollusk-svm = "0.0.12"
+solana-sdk = "2.1"
+sha2 = "0.10"
