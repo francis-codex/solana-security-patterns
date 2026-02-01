@@ -87,6 +87,38 @@ SBF_OUT_DIR=target/deploy cargo test -p test-reinitialization -- --nocapture
 - `secure_blocks_reinit` — Secure version rejects re-initialization (error 6000: AlreadyInitialized)
 - `secure_allows_first_init` — First initialization works normally
 
+## Pinocchio Version
+
+Without Anchor's `init` constraint, you must manually check:
+
+```rust
+// VULNERABLE: No initialization guard
+fn init_vulnerable(accounts: &[AccountInfo]) -> ProgramResult {
+    let config = &accounts[0];
+    let mut data = config.try_borrow_mut_data()?;
+
+    // Blindly overwrites - can be called repeatedly!
+    data[8..40].copy_from_slice(authority.key().as_ref());
+    data[40] = 1;  // is_initialized
+}
+
+// SECURE: Check before writing
+fn init_secure(accounts: &[AccountInfo]) -> ProgramResult {
+    let config = &accounts[0];
+    let mut data = config.try_borrow_mut_data()?;
+
+    // SECURE: Check if already initialized
+    if data[40] != 0 {
+        return Err(ProgramError::Custom(ERR_ALREADY_INITIALIZED));
+    }
+
+    data[8..40].copy_from_slice(authority.key().as_ref());
+    data[40] = 1;
+}
+```
+
+Build: `cargo build-sbf --manifest-path patterns/04-reinitialization-attack/pinocchio/Cargo.toml`
+
 ## Key Takeaway
 
-**Initialization should be a one-time operation. Use `init` constraints or explicit guards—never assume an instruction will only be called once.**
+**Initialization should be a one-time operation. Use `init` constraints (Anchor) or explicit `is_initialized` guards (Pinocchio)—never assume an instruction will only be called once.**

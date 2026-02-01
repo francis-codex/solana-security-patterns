@@ -97,6 +97,30 @@ SBF_OUT_DIR=target/deploy cargo test -p test-pda-bump -- --nocapture
 - `secure_rejects_non_canonical_bump` — Secure version rejects non-canonical PDA (error 6001: PdaMismatch)
 - `secure_accepts_canonical_bump` — Canonical bump works correctly
 
+## Pinocchio Version
+
+Same concept, using Pinocchio's pubkey functions:
+
+```rust
+use pinocchio::pubkey::{create_program_address, find_program_address};
+
+// VULNERABLE: Accepts user-supplied bump
+fn set_value_vulnerable(program_id: &Pubkey, accounts: &[AccountInfo], bump: u8) {
+    let seeds: &[&[u8]] = &[b"data", user.key().as_ref(), &[bump]];
+    let expected_pda = create_program_address(seeds, program_id)?;
+    // Any valid bump works - not just canonical!
+}
+
+// SECURE: Derives canonical bump
+fn set_value_secure(program_id: &Pubkey, accounts: &[AccountInfo]) {
+    let seeds: &[&[u8]] = &[b"data", user.key().as_ref()];
+    let (expected_pda, canonical_bump) = find_program_address(seeds, program_id);
+    // Only canonical PDA accepted
+}
+```
+
+Build: `cargo build-sbf --manifest-path patterns/05-pda-bump-canonicalization/pinocchio/Cargo.toml`
+
 ## Key Takeaway
 
-**One seed set = one canonical PDA. Derive the bump with `find_program_address`, never accept it as input.**
+**One seed set = one canonical PDA. Derive the bump with `find_program_address`, never accept it as input—in Anchor or Pinocchio.**

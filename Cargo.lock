@@ -1476,6 +1476,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "integer-overflow-pinocchio"
+version = "0.1.0"
+dependencies = [
+ "pinocchio",
+]
+
+[[package]]
 name = "ipnet"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1677,11 +1684,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "missing-owner-pinocchio"
+version = "0.1.0"
+dependencies = [
+ "pinocchio",
+]
+
+[[package]]
 name = "missing-signer"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "blake3",
+]
+
+[[package]]
+name = "missing-signer-pinocchio"
+version = "0.1.0"
+dependencies = [
+ "pinocchio",
 ]
 
 [[package]]
@@ -1900,6 +1921,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pda-bump-pinocchio"
+version = "0.1.0"
+dependencies = [
+ "pinocchio",
+]
+
+[[package]]
 name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1925,6 +1953,12 @@ name = "pin-utils"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
+
+[[package]]
+name = "pinocchio"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c33b58567c11b07749cefbb8320ac023f3387c57807aeb8e3b1262501b6e9f0"
 
 [[package]]
 name = "potential_utf"
@@ -2104,6 +2138,13 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "blake3",
+]
+
+[[package]]
+name = "reinitialization-pinocchio"
+version = "0.1.0"
+dependencies = [
+ "pinocchio",
 ]
 
 [[package]]
@@ -3608,6 +3649,13 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "blake3",
+]
+
+[[package]]
+name = "type-cosplay-pinocchio"
+version = "0.1.0"
+dependencies = [
+ "pinocchio",
 ]
 
 [[package]]

@@ -86,6 +86,30 @@ SBF_OUT_DIR=target/deploy cargo test -p test-integer-overflow -- --nocapture
 - `secure_blocks_underflow` — Secure burn rejects underflow (error 6001)
 - `secure_allows_valid_mint` — Normal operations work fine
 
+## Pinocchio Version
+
+The vulnerability and fix are identical—checked arithmetic is standard Rust:
+
+```rust
+// VULNERABLE: wrapping arithmetic
+fn mint_vulnerable(accounts: &[AccountInfo], amount: u64) -> ProgramResult {
+    let supply = u64::from_le_bytes(data[40..48].try_into()?);
+    let new_supply = supply.wrapping_add(amount);  // Wraps at u64::MAX!
+    data[40..48].copy_from_slice(&new_supply.to_le_bytes());
+}
+
+// SECURE: checked arithmetic
+fn mint_secure(accounts: &[AccountInfo], amount: u64) -> ProgramResult {
+    let supply = u64::from_le_bytes(data[40..48].try_into()?);
+    let new_supply = supply
+        .checked_add(amount)
+        .ok_or(ProgramError::Custom(ERR_OVERFLOW))?;
+    data[40..48].copy_from_slice(&new_supply.to_le_bytes());
+}
+```
+
+Build: `cargo build-sbf --manifest-path patterns/03-integer-overflow/pinocchio/Cargo.toml`
+
 ## Key Takeaway
 
-**Never trust raw arithmetic with user-controlled values. `checked_*` methods exist for a reason—use them.**
+**Never trust raw arithmetic with user-controlled values. `checked_*` methods exist for a reason—use them everywhere, Anchor or Pinocchio.**

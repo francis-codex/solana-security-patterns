@@ -90,6 +90,37 @@ SBF_OUT_DIR=target/deploy cargo test -p test-type-cosplay -- --nocapture
 - `secure_rejects_wrong_discriminator` — Secure version rejects wrong type (error 3002: AccountDiscriminatorMismatch)
 - `secure_accepts_real_admin_config` — Real AdminConfig with correct admin works fine
 
+## Pinocchio Version
+
+Without Anchor's automatic discriminator check, verify manually:
+
+```rust
+const ADMIN_CONFIG_DISC: [u8; 8] = [0xAD, 0x11, 0x1C, 0x0F, ...];
+
+// VULNERABLE: No discriminator check
+fn update_fee_vulnerable(accounts: &[AccountInfo], new_fee: u64) {
+    let data = config.try_borrow_data()?;
+    let admin = read_pubkey(&data[8..40]);  // Could be UserData.authority!
+    // ...
+}
+
+// SECURE: Check discriminator first
+fn update_fee_secure(accounts: &[AccountInfo], new_fee: u64) {
+    let data = config.try_borrow_data()?;
+
+    // SECURE: Verify account type
+    let disc: [u8; 8] = data[0..8].try_into()?;
+    if disc != ADMIN_CONFIG_DISC {
+        return Err(ProgramError::Custom(ERR_WRONG_DISCRIMINATOR));
+    }
+
+    // Now safe to read as AdminConfig
+    let admin = read_pubkey(&data[8..40]);
+}
+```
+
+Build: `cargo build-sbf --manifest-path patterns/06-type-cosplay/pinocchio/Cargo.toml`
+
 ## Key Takeaway
 
-**Same layout ≠ same type. The 8-byte discriminator is what distinguishes account types. Always use `Account<T>` to enforce type safety.**
+**Same layout ≠ same type. The 8-byte discriminator distinguishes account types. Use `Account<T>` (Anchor) or manual discriminator checks (Pinocchio) to enforce type safety.**

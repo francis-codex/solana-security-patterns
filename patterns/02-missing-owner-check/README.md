@@ -61,6 +61,36 @@ SBF_OUT_DIR=target/deploy cargo test -p test-missing-owner -- --nocapture
 - `secure_rejects_fake_account` — Secure version rejects wrong owner (error 3007: AccountOwnedByWrongProgram)
 - `secure_accepts_real_treasury` — Legitimate program-owned treasury works fine
 
+## Pinocchio Version
+
+In Pinocchio, you must manually verify account ownership:
+
+```rust
+// VULNERABLE: No owner check
+fn process_vulnerable(accounts: &[AccountInfo]) -> ProgramResult {
+    let treasury = &accounts[0];
+    let data = treasury.try_borrow_data()?;
+    // Trusting data from ANY program!
+    let balance = u64::from_le_bytes(data[40..48].try_into()?);
+}
+
+// SECURE: Check owner before trusting data
+fn process_secure(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+    let treasury = &accounts[0];
+
+    // SECURE: Verify owner first
+    let owner = unsafe { treasury.owner() };
+    if owner != program_id {
+        return Err(ProgramError::Custom(ERR_INVALID_OWNER));
+    }
+
+    // Now safe to trust the data
+    let data = treasury.try_borrow_data()?;
+}
+```
+
+Build: `cargo build-sbf --manifest-path patterns/02-missing-owner-check/pinocchio/Cargo.toml`
+
 ## Key Takeaway
 
-**`AccountInfo` gives you bytes. `Account<T>` gives you verified, trusted data. The Wormhole hack happened because of this difference.**
+**`AccountInfo` gives you bytes. `Account<T>` (Anchor) or manual `owner()` check (Pinocchio) gives you verified, trusted data. The Wormhole hack happened because of this difference.**

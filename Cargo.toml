@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "patterns/*/anchor",
+    "patterns/*/pinocchio",
     "patterns/*/tests",
 ]
 resolver = "2"

@@ -62,6 +62,38 @@ SBF_OUT_DIR=target/deploy cargo test -p test-missing-signer -- --nocapture
 - `secure_rejects_unsigned_withdraw` — Secure version rejects unsigned withdrawal (error 3010: AccountNotSigner)
 - `secure_allows_signed_withdraw` — Legitimate signed withdrawal succeeds
 
+## Pinocchio Version
+
+In Pinocchio, there's no `Signer<'info>` type. You must manually check `is_signer()`:
+
+```rust
+// VULNERABLE: No signer check
+fn withdraw_vulnerable(accounts: &[AccountInfo], ...) -> ProgramResult {
+    let authority = &accounts[1];
+
+    // Only checks pubkey match - NOT signature!
+    if stored_authority != *authority.key() {
+        return Err(ProgramError::Custom(ERR_INVALID_AUTHORITY));
+    }
+    // Missing: authority.is_signer() check
+    // ...
+}
+
+// SECURE: Explicit signer check
+fn withdraw_secure(accounts: &[AccountInfo], ...) -> ProgramResult {
+    let authority = &accounts[1];
+
+    // SECURE: Check signature FIRST
+    if !authority.is_signer() {
+        return Err(ProgramError::Custom(ERR_MISSING_SIGNER));
+    }
+    // Then check pubkey match
+    // ...
+}
+```
+
+Build: `cargo build-sbf --manifest-path patterns/01-missing-signer-check/pinocchio/Cargo.toml`
+
 ## Key Takeaway
 
-**`has_one` checks the pubkey. `Signer<'info>` checks the signature. You need both.**
+**`has_one` checks the pubkey. `Signer<'info>` (Anchor) or `is_signer()` (Pinocchio) checks the signature. You need both.**

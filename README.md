@@ -3,9 +3,9 @@
 A hands-on educational resource for Solana developers to learn common smart contract vulnerabilities through working code and exploit tests.
 
 Each pattern includes:
-- **Vulnerable implementation** — Demonstrates the security flaw
-- **Secure implementation** — Shows the proper fix
-- **Exploit tests** — Proves the vulnerability is real and the fix works
+- **Anchor implementation** — Vulnerable + secure versions using the Anchor framework
+- **Pinocchio implementation** — Same patterns using low-level Pinocchio for comparison
+- **Mollusk exploit tests** — Proves the vulnerability is real and the fix works
 
 ## Patterns
 
@@ -33,6 +33,11 @@ Each pattern includes:
 for dir in patterns/*/anchor; do
   cargo build-sbf --manifest-path "$dir/Cargo.toml"
 done
+
+# Build all Pinocchio programs
+for dir in patterns/*/pinocchio; do
+  cargo build-sbf --manifest-path "$dir/Cargo.toml"
+done
 ```
 
 ### Run Exploit Tests
@@ -57,12 +62,14 @@ solana-security-patterns/
 ├── patterns/
 │   ├── 01-missing-signer-check/
 │   │   ├── anchor/          # Anchor program (vulnerable + secure)
+│   │   ├── pinocchio/       # Pinocchio program (vulnerable + secure)
 │   │   ├── tests/           # Mollusk exploit tests
 │   │   └── README.md        # Pattern documentation
 │   ├── 02-missing-owner-check/
 │   │   └── ...
 │   └── ...
 ├── Cargo.toml               # Workspace configuration
+├── DEEP_DIVE.md             # In-depth vulnerability analysis
 └── README.md
 ```
 
